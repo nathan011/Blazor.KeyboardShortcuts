@@ -20,9 +20,9 @@ namespace Blazor.KeyboardShortcuts.Demo
             var host = builder.Build();
             var nav = host.Services.GetService<NavigationManager>();
             var shortcuts = host.Services.GetService<KeyboardShortcutsService>();
-            shortcuts.CreateGlobalChord(new KeyboardShortcutChord(ModKeys.None, KeyCodes.G, ModKeys.None, KeyCodes.H, () => nav.NavigateTo("/"), "go to home page"));
-            shortcuts.CreateGlobalChord(new KeyboardShortcutChord(ModKeys.None, KeyCodes.G, ModKeys.None, KeyCodes.C, () => nav.NavigateTo("/counter"), "go to counter page"));
-            shortcuts.CreateGlobalChord(new KeyboardShortcutChord(ModKeys.None, KeyCodes.G, ModKeys.None, KeyCodes.F, () => nav.NavigateTo("/fetchdata"), "go to fetch data  page"));
+            shortcuts.CreateGlobalChord(new KeyboardShortcutChord(ModKeys.None, KeyCodes.G, ModKeys.None, KeyCodes.H, () => nav.NavigateTo(nav.BaseUri), "go to home page"));
+            shortcuts.CreateGlobalChord(new KeyboardShortcutChord(ModKeys.None, KeyCodes.G, ModKeys.None, KeyCodes.C, () => nav.NavigateTo(nav.BaseUri + "counter"), "go to counter page"));
+            shortcuts.CreateGlobalChord(new KeyboardShortcutChord(ModKeys.None, KeyCodes.G, ModKeys.None, KeyCodes.F, () => nav.NavigateTo(nav.BaseUri + "fetchdata"), "go to fetch data  page"));
             await host.RunAsync();
         }
     }
