@@ -1,0 +1,73 @@
+﻿@page "/counter"
+@inject KeyboardShortcutsService kb
+@implements IDisposable
+
+<h1>Counter</h1>
+
+<p>Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<h2>Keydown Event Data: @keypress</h2>
+<h4>Global Shortcut Chords</h4>
+<ul>
+    <li>
+        g, then, h: go to Home
+    </li>
+    <li>
+        g, then, c: go to Counter
+    </li>
+    <li>
+        g, then, f: go to Fetch Data
+    </li>
+</ul>
+<h4>Page Shortcuts</h4>
+<ul>
+    <li>
+        add (numpad): increment
+    </li>
+    <li>
+        subtract (numpad): decrement
+    </li>
+    <li>
+        tab (default behavior disabled): toggle between tables
+    </li>
+</ul>
+@code {
+    string keypress;
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+    protected override Task OnInitializedAsync()
+    {
+        kb.Keydown += KB_Keydown;
+        kb.CreateReplaceContextShortcuts(
+            new[]
+            {
+                new KeyboardShortcut(ModKeys.None, KeyCodes.Add, inc_counter),
+                new KeyboardShortcut(ModKeys.None, KeyCodes.Subtract, dec_counter),
+                                });
+        return base.OnInitializedAsync();
+    }
+    void inc_counter()
+    {
+        currentCount++;
+        StateHasChanged();
+    }
+    void dec_counter()
+    {
+        currentCount--;
+        StateHasChanged();
+    }
+    void KB_Keydown(object sender, KeydownEventArgs e)
+    {
+        keypress = e.ToString();
+        StateHasChanged();
+    }
+    public void Dispose()
+    {
+        kb.Keydown -= KB_Keydown;
+    }
+}

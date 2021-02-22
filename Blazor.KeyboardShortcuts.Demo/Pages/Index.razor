@@ -1,0 +1,152 @@
+﻿@page "/"
+@inject KeyboardShortcutsService kb
+@implements IDisposable
+
+<h2>Keydown Event Data: @keypress</h2>
+<h4>Global Shortcut Chords</h4>
+<ul>
+    <li>
+        g, then, h: go to Home
+    </li>
+    <li>
+        g, then, c: go to Counter
+    </li>
+    <li>
+        g, then, f: go to Fetch Data
+    </li>
+</ul>
+<h4>Page Shortcuts</h4>
+<ul>
+    <li>
+        j/k: next/prev row
+    </li>
+    <li>
+        down/up: next/prev row
+    </li>
+    <li>
+        tab (default behavior disabled): toggle between tables
+    </li>
+</ul>
+Disable Shortcuts: <input type="checkbox" @bind-value="kb.Disabled" />
+<h4>Table 1</h4>
+<table>
+    <tr>
+        <th style="width:100px">Col1</th>
+        <th style="width:100px">Col2</th>
+        <th style="width:100px">Col3</th>
+    </tr>
+    @{
+        foreach (var obj in objs)
+        {
+            <tr style="background-color: @(obj == sel_obj ? "lightgrey" : "none")">
+                <td>@obj.c1</td>
+                <td>@obj.c2</td>
+                <td>@obj.c3</td>
+            </tr>
+        }
+    }
+</table>
+<h4>Table 2</h4>
+<table>
+    <tr>
+        <th style="width:100px">Col1</th>
+        <th style="width:100px">Col2</th>
+        <th style="width:100px">Col3</th>
+        <th style="width:100px">Col4</th>
+    </tr>
+    @{
+        foreach (var obj in objs2)
+        {
+            <tr style="background-color: @(obj == sel_obj2 ? "lightgrey" : "none")">
+                <td>@obj.c1</td>
+                <td>@obj.c2</td>
+                <td>@obj.c3</td>
+                <td>@obj.c4</td>
+            </tr>
+        }
+    }
+</table>
+Shortcuts disabled in textarea and input (type=text) by default (can be enabled per command):
+<textarea>
+
+</textarea>
+
+@code
+{
+    string keypress;
+    List<test_obj> objs = new List<test_obj>();
+    List<test_obj2> objs2 = new List<test_obj2>();
+    test_obj sel_obj;
+    test_obj2 sel_obj2;
+    protected override Task OnInitializedAsync()
+    {
+        kb.Keydown += KB_Keydown;
+        objs.Add(new test_obj("a", "b", "c"));
+        objs.Add(new test_obj("a2", "b2", "c2"));
+        objs.Add(new test_obj("a3", "b3", "c3"));
+        sel_obj = objs[0];
+        objs2.Add(new test_obj2("1", "2", "3", "4"));
+        objs2.Add(new test_obj2("1", "2d", "3d", "4d"));
+        objs2.Add(new test_obj2("1", "2e", "3e", "4e"));
+        objs2.Add(new test_obj2("1", "2f", "3f", "4f"));
+        kb.CreateReplaceContextShortcuts(
+            new[]
+            {
+                new KeyboardShortcut(ModKeys.None, KeyCodes.J, sel_next),
+                new KeyboardShortcut(ModKeys.None, KeyCodes.K, sel_prev),
+                new KeyboardShortcut(ModKeys.None, KeyCodes.DownArrow, sel_next),
+                new KeyboardShortcut(ModKeys.None, KeyCodes.UpArrow, sel_prev),
+                new KeyboardShortcut(ModKeys.None, KeyCodes.Tab, toggle_table, prevent_default: true),
+                                });
+        return base.OnInitializedAsync();
+    }
+    void toggle_table()
+    {
+        if (sel_obj != null)
+        {
+            sel_obj = null;
+            sel_obj2 = objs2[0];
+        }
+        else
+        {
+            sel_obj2 = null;
+            sel_obj = objs[0];
+        }
+        StateHasChanged();
+    }
+    void sel_next()
+    {
+        if (sel_obj != null)
+        {
+            sel_obj = sel_obj == objs[^1] ? sel_obj : objs.SkipWhile(o => o != sel_obj).Skip(1).FirstOrDefault();
+        }
+        else
+        {
+            sel_obj2 = sel_obj2 == objs2[^1] ? sel_obj2 : objs2.SkipWhile(o => o != sel_obj2).Skip(1).FirstOrDefault();
+        }
+        StateHasChanged();
+    }
+    void sel_prev()
+    {
+        if (sel_obj != null)
+        {
+            sel_obj = sel_obj == objs[0] ? sel_obj : ((IEnumerable<test_obj>)objs).Reverse().SkipWhile(o => o != sel_obj).Skip(1).FirstOrDefault();
+        }
+        else
+        {
+            sel_obj2 = sel_obj2 == objs2[0] ? sel_obj2 : ((IEnumerable<test_obj2>)objs2).Reverse().SkipWhile(o => o != sel_obj2).Skip(1).FirstOrDefault();
+        }
+        StateHasChanged();
+    }
+    void KB_Keydown(object sender, KeydownEventArgs e)
+    {
+        keypress = e.ToString();
+        StateHasChanged();
+    }
+    public void Dispose()
+    {
+        kb.Keydown -= KB_Keydown;
+    }
+    public record test_obj(string c1, string c2, string c3);
+    public record test_obj2(string c1, string c2, string c3, string c4);
+}
