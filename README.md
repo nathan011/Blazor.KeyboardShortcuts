@@ -6,7 +6,7 @@ Demo available at [https://nathan011.github.io/Blazor.KeyboardShortcuts](https:/
 Inspired by [Toolbelt.Blazor.HotKeys](https://github.com/jsakamoto/Toolbelt.Blazor.HotKeys), but with a few additional features, and the application logic in C#, rather than javascript.
 
 ### Usage
-1) Install [nuget package](https://www.nuget.org/packages/BlazorKeyboardShortcuts/1.0.0)
+1) Install [nuget package](https://www.nuget.org/packages/BlazorKeyboardShortcuts)
 
 2) In Program.cs add the service to the DI builder.
 ```C#
