@@ -41,3 +41,8 @@ protected override Task OnInitializedAsync()
         return base.OnInitializedAsync();
     }
  ```
+
+
+### Tips
+1) Shortcuts can be disabled/enabled at any time by setting the Disabled property false.
+2) Event frequency can be throttled by setting the ThrottleMilliseconds property > 0.

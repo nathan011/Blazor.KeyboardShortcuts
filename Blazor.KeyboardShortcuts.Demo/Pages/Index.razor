@@ -27,7 +27,10 @@
         tab (default behavior disabled): toggle between tables
     </li>
 </ul>
-Disable Shortcuts: <input type="checkbox" @bind-value="kb.Disabled" />
+Disable Shortcuts:
+<input type="checkbox" @bind-value="kb.Disabled" />
+Throttle Repeats:
+<input type="number" @bind-value="kb.ThrottleMilliseconds" min="0" max="1000" step="20" />
 <h4>Table 1</h4>
 <table>
     <tr>
@@ -85,10 +88,10 @@ Shortcuts disabled in textarea and input (type=text) by default (can be enabled 
         objs.Add(new test_obj("a2", "b2", "c2"));
         objs.Add(new test_obj("a3", "b3", "c3"));
         sel_obj = objs[0];
-        objs2.Add(new test_obj2("1", "2", "3", "4"));
-        objs2.Add(new test_obj2("1", "2d", "3d", "4d"));
-        objs2.Add(new test_obj2("1", "2e", "3e", "4e"));
-        objs2.Add(new test_obj2("1", "2f", "3f", "4f"));
+        for (int i = 0; i < 100; i++)
+        {
+            objs2.Add(new test_obj2($"c1{i}",$"c2{i}",$"c3{i}",$"c4{i}"));
+        }
         kb.CreateReplaceContextShortcuts(
             new[]
             {
@@ -97,7 +100,7 @@ Shortcuts disabled in textarea and input (type=text) by default (can be enabled 
                 new KeyboardShortcut(ModKeys.None, KeyCodes.DownArrow, sel_next),
                 new KeyboardShortcut(ModKeys.None, KeyCodes.UpArrow, sel_prev),
                 new KeyboardShortcut(ModKeys.None, KeyCodes.Tab, toggle_table, prevent_default: true),
-                                });
+                                    });
         return base.OnInitializedAsync();
     }
     void toggle_table()

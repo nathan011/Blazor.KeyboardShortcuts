@@ -11,8 +11,9 @@ namespace Blazor.KeyboardShortcuts
         bool chord_started;
         (ModKeys mods, KeyCodes key) chord_start_keys;
         //ILogger<KeyboardShortcutsService> logger;
-        Dictionary<(ModKeys, KeyCodes), KeyboardShortcut> global_shortcuts = new Dictionary<(ModKeys, KeyCodes), KeyboardShortcut>();
-        Dictionary<(ModKeys, KeyCodes), KeyboardShortcut> context_shortcuts = new Dictionary<(ModKeys, KeyCodes), KeyboardShortcut>();
+        Dictionary<(int, int), DateTime> throttle_dict = new();
+        Dictionary<(ModKeys, KeyCodes), KeyboardShortcut> global_shortcuts = new();
+        Dictionary<(ModKeys, KeyCodes), KeyboardShortcut> context_shortcuts = new();
         Dictionary<(ModKeys, KeyCodes), Dictionary<(ModKeys, KeyCodes), KeyboardShortcutChord>> global_chords = new Dictionary<(ModKeys, KeyCodes), Dictionary<(ModKeys, KeyCodes), KeyboardShortcutChord>>();
         Dictionary<(ModKeys, KeyCodes), Dictionary<(ModKeys, KeyCodes), KeyboardShortcutChord>> context_chords = new Dictionary<(ModKeys, KeyCodes), Dictionary<(ModKeys, KeyCodes), KeyboardShortcutChord>>();
         public KeyboardShortcutsService(IJSRuntime jSRuntime)
@@ -23,6 +24,7 @@ namespace Blazor.KeyboardShortcuts
         }
         public event EventHandler<KeydownEventArgs> Keydown;
         public bool Disabled { get; set; }
+        public int ThrottleMilliseconds { get; set; }
         public IEnumerable<KeyboardShortcut> GlobalShortcuts { get => global_shortcuts.Values; }
         public IEnumerable<KeyboardShortcutChord> GlobalShortcutChords { get => global_chords.Values.SelectMany(v => v.Values); }
         public IEnumerable<KeyboardShortcut> ContextShortcuts { get => context_shortcuts.Values; }
@@ -98,6 +100,14 @@ namespace Blazor.KeyboardShortcuts
         public bool DotnetOnkeydown(int modkeys, string key, int keyCode, string tagName, string type)
         {
             if (Disabled) return false;
+            if (ThrottleMilliseconds > 0)
+            {
+                if (throttle_dict.TryGetValue((modkeys, keyCode), out var last_keydown) && DateTime.Now.Subtract(last_keydown).TotalMilliseconds < ThrottleMilliseconds)
+                {
+                    return false;
+                }
+                throttle_dict[(modkeys, keyCode)] = DateTime.Now;
+            }
             var prevent_default = false;
             //logger.LogDebug($"keydown: {modkeys}, {key}, {keyCode}, {tagName}, {type}");
             Enum.TryParse<ModKeys>(modkeys.ToString(), out var mods);
