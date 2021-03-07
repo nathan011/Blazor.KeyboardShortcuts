@@ -6,12 +6,14 @@ Demo available at [https://nathan011.github.io/Blazor.KeyboardShortcuts](https:/
 Inspired by [Toolbelt.Blazor.HotKeys](https://github.com/jsakamoto/Toolbelt.Blazor.HotKeys), but with a few additional features, and the application logic in C#, rather than javascript.
 
 ### Usage
-1) In Program.cs add the service to the DI builder.
+1) Install [nuget package](https://www.nuget.org/packages/BlazorKeyboardShortcuts)
+
+2) In Program.cs add the service to the DI builder.
 ```C#
 builder.Services.AddKeyboardShortcuts();
 ```
 
-2) (Optional) In Program.cs, create global shortcuts/chords (such as navigation commands):
+3) (Optional) In Program.cs, create global shortcuts/chords (such as navigation commands):
 ```C#
 var host = builder.Build();
 var nav = host.Services.GetService<NavigationManager>();
@@ -20,12 +22,12 @@ shortcuts.CreateGlobalChord(new KeyboardShortcutChord(ModKeys.None, KeyCodes.G, 
 shortcuts.CreateGlobalChord(new KeyboardShortcutChord(ModKeys.None, KeyCodes.G, ModKeys.None, KeyCodes.C, () => nav.NavigateTo(nav.BaseUri + "counter"), "go to counter page"));
 shortcuts.CreateGlobalChord(new KeyboardShortcutChord(ModKeys.None, KeyCodes.G, ModKeys.None, KeyCodes.F, () => nav.NavigateTo(nav.BaseUri + "fetchdata"), "go to fetch data  page"));
 ```
-3) Inject the service into pages:
+4) Inject the service into pages:
 ```C#
 @inject KeyboardShortcutsService kb
 ```
 
-4) Use injected service to create shortcuts:
+5) Use injected service to create shortcuts:
 ```C#
 protected override Task OnInitializedAsync()
     {
