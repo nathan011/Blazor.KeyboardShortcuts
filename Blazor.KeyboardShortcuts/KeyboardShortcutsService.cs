@@ -150,7 +150,7 @@ namespace Blazor.KeyboardShortcuts
                     shortcut.Action.Invoke();
                     prevent_default = shortcut.PreventDefault;
                 }
-                else if (global_chords.ContainsKey((mods, keycode)) || context_chords.ContainsKey((mods, keycode)) && (shortcut.AllowIn == AllowIn.Anywhere || !IsTextInput(tagName, type)))
+                else if ((global_chords.ContainsKey((mods, keycode)) || context_chords.ContainsKey((mods, keycode))) && (shortcut.AllowIn == AllowIn.Anywhere || !IsTextInput(tagName, type)))
                 {
                     chord_started = true;
                     chord_start_keys = (mods, keycode);
